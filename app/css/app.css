@@ -1,4 +1,4 @@
-/* ================= TikTok Lite — vanilla CSS, no deps ================= */
+/* ============ TikTok Lite — vanilla CSS, no deps ============ */
 :root{
   --pink:#fe2c55; --cyan:#25f4ee; --bg:#000;
   --nav-h:52px;
@@ -8,7 +8,7 @@
 html,body{height:100%;background:#000;overscroll-behavior:none}
 body{
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-  color:#fff; user-select:none; -webkit-user-select:none;
+  color:#fff; user-select:none; -webkit-user-select:none; touch-action:manipulation;
 }
 button{font-family:inherit;color:inherit;background:none;border:0;cursor:pointer}
 #phone{position:fixed;inset:0;display:flex;justify-content:center;background:#000;overflow:hidden}
@@ -31,6 +31,16 @@ button{font-family:inherit;color:inherit;background:none;border:0;cursor:pointer
 .slide .shade-bottom{position:absolute;bottom:0;left:0;right:0;height:230px;
   background:linear-gradient(0deg,rgba(0,0,0,.55),transparent);pointer-events:none}
 
+/* video loader & error */
+.loader{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:5;
+  width:38px;height:38px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;
+  animation:spin .8s linear infinite}
+.vid-err{position:absolute;inset:0;z-index:8;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:12px;background:rgba(0,0,0,.65);text-align:center;padding:0 30px}
+.vid-err svg{width:46px;height:46px;fill:rgba(255,255,255,.65)}
+.vid-err p{font-size:14px;color:rgba(255,255,255,.85);line-height:1.45}
+.vid-err button{padding:10px 24px;border-radius:5px;background:var(--pink);font-weight:600;font-size:14.5px}
+
 /* ---------- top bar ---------- */
 #topbar{
   position:fixed;top:0;left:50%;transform:translateX(-50%);
@@ -50,10 +60,9 @@ button{font-family:inherit;color:inherit;background:none;border:0;cursor:pointer
 }
 #btn-search{
   position:absolute;right:14px;top:50%;transform:translateY(-38%);
-  width:32px;height:32px;pointer-events:auto;padding-top:env(safe-area-inset-top,0px);
+  width:32px;height:32px;pointer-events:auto;
 }
-#btn-search svg{width:24px;height:24px;fill:#fff}
-.top-icon svg{filter:drop-shadow(0 1px 2px rgba(0,0,0,.4))}
+#btn-search svg{width:24px;height:24px;fill:#fff;filter:drop-shadow(0 1px 2px rgba(0,0,0,.4))}
 
 #btn-mute{
   position:fixed;top:78px;right:max(14px, calc(50% - 246px));z-index:30;width:34px;height:34px;
@@ -95,7 +104,7 @@ button{font-family:inherit;color:inherit;background:none;border:0;cursor:pointer
 }
 .follow-plus svg{width:13px;height:13px;fill:#fff}
 .follow-plus.followed{background:#fff}
-.follow-plus.followed svg{fill:var(--pink);transform:rotate(0)}
+.follow-plus.followed svg{fill:var(--pink)}
 .like-btn.liked svg{fill:var(--pink);animation:likePop .35s cubic-bezier(.2,1.6,.4,1)}
 .save-btn.saved svg{fill:#face15;animation:likePop .35s cubic-bezier(.2,1.6,.4,1)}
 @keyframes likePop{0%{transform:scale(0)}60%{transform:scale(1.35)}100%{transform:scale(1)}}
@@ -132,7 +141,7 @@ button{font-family:inherit;color:inherit;background:none;border:0;cursor:pointer
   bottom:calc(var(--nav-h) + var(--safe-b) + 14px);
   z-index:10;display:flex;flex-direction:column;gap:7px;
 }
-.meta .user{font-size:16.5px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.meta .user{font-size:16.5px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.5);cursor:pointer}
 .meta .cap{font-size:14px;line-height:1.35;text-shadow:0 1px 3px rgba(0,0,0,.5);
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .meta .cap .tag{font-weight:600}
@@ -164,7 +173,6 @@ button{font-family:inherit;color:inherit;background:none;border:0;cursor:pointer
 .navbtn svg{width:25px;height:25px;fill:currentColor}
 .navbtn span{font-size:10px;font-weight:500}
 .navbtn.active{color:#fff}
-.navbtn.active svg{fill:#fff}
 .navbtn.create{position:relative}
 .c-body{
   position:relative;z-index:2;width:44px;height:29px;border-radius:8px;background:#fff;
@@ -175,13 +183,51 @@ button{font-family:inherit;color:inherit;background:none;border:0;cursor:pointer
 .c-red{background:var(--pink);left:calc(50% - 26px)}
 .c-cyan{background:var(--cyan);left:calc(50% - 18px)}
 
+/* ---------- profile page ---------- */
+#profile-page{
+  position:fixed;top:0;bottom:0;left:50%;transform:translate(-50%,103%);
+  width:100%;max-width:520px;background:#000;z-index:55;
+  display:flex;flex-direction:column;
+  transition:transform .3s cubic-bezier(.32,.72,.25,1);
+}
+#profile-page.open{transform:translate(-50%,0)}
+.pp-head{display:flex;align-items:center;gap:14px;padding:calc(12px + env(safe-area-inset-top,0px)) 14px 10px}
+.pp-head button{width:30px;height:30px;display:flex;align-items:center;justify-content:center}
+.pp-head svg{width:24px;height:24px;fill:#fff}
+#pp-title{font-weight:700;font-size:17px}
+.pp-scroll{flex:1;overflow-y:auto;scrollbar-width:none}
+.pp-scroll::-webkit-scrollbar{display:none}
+.pp-top{display:flex;flex-direction:column;align-items:center;padding:16px 16px 6px;gap:10px}
+.pp-avatar{width:92px;height:92px;border-radius:50%;font-size:36px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;border:1.5px solid rgba(255,255,255,.2)}
+.pp-name{font-size:17px;font-weight:700}
+.pp-stats{display:flex;gap:36px;margin-top:2px}
+.pp-stats div{display:flex;flex-direction:column;align-items:center;gap:1px}
+.pp-stats b{font-size:17px}
+.pp-stats span{font-size:12.5px;color:rgba(255,255,255,.6)}
+.pp-actions{display:flex;gap:8px;margin-top:6px}
+.pp-actions button{height:38px;border-radius:5px;padding:0 26px;font-size:15px;font-weight:600;background:#2a2a2a;color:#fff}
+.pp-actions button.follow{background:var(--pink)}
+.pp-bio{font-size:13.5px;color:rgba(255,255,255,.75);text-align:center;max-width:82%;line-height:1.45;white-space:pre-line}
+.pp-tabs{display:flex;border-bottom:.5px solid rgba(255,255,255,.12);margin-top:12px}
+.pp-tab{flex:1;display:flex;justify-content:center;padding:11px 0;position:relative}
+.pp-tab svg{width:20px;height:20px;fill:rgba(255,255,255,.45)}
+.pp-tab.active::after{content:"";position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);width:46px;height:2.5px;background:#fff}
+.pp-tab.active svg{fill:#fff}
+#pp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5px}
+.pp-item{position:relative;aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.pp-item .init{font-size:34px;font-weight:700;opacity:.9;text-shadow:0 2px 6px rgba(0,0,0,.3)}
+.pp-item .likes{position:absolute;left:6px;bottom:6px;display:flex;align-items:center;gap:4px;font-size:12.5px;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.pp-item .likes svg{width:13px;height:13px;fill:#fff}
+#pp-empty{padding:48px 34px;text-align:center;color:rgba(255,255,255,.55);font-size:14px;line-height:1.55}
+
 /* ---------- sheets ---------- */
-#overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .25s;z-index:45}
+#overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .25s;z-index:60}
 #overlay.show{opacity:1;pointer-events:auto}
 .sheet{
   position:fixed;left:50%;bottom:0;transform:translate(-50%,105%);
   width:100%;max-width:520px;height:62%;
-  background:#121212;border-radius:14px 14px 0 0;z-index:50;
+  background:#121212;border-radius:14px 14px 0 0;z-index:65;
   transition:transform .3s cubic-bezier(.32,.72,.25,1);
   display:flex;flex-direction:column;
 }
@@ -241,8 +287,3 @@ button{font-family:inherit;color:inherit;background:none;border:0;cursor:pointer
   transition:opacity .25s,transform .25s;white-space:nowrap;max-width:88%;overflow:hidden;text-overflow:ellipsis;
 }
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
-/* loader */
-.loader{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:5;
-  width:38px;height:38px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;
-  animation:spin .8s linear infinite}

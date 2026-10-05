@@ -25,15 +25,48 @@
   </header>
 
   <!-- mute / unmute -->
-  <button id="btn-mute" class="muted-badge" aria-label="Suara">
+  <button id="btn-mute" aria-label="Suara">
     <svg class="ic-muted" viewBox="0 0 24 24"><path d="M12 3 7 8H3v8h4l5 5V3Zm7.3 3.3 1.4 1.4L18.4 10l2.3 2.3-1.4 1.4-2.3-2.3-2.3 2.3-1.4-1.4 2.3-2.3-2.3-2.3 1.4-1.4 2.3 2.3 2.3-2.3Z"/></svg>
     <svg class="ic-unmuted" viewBox="0 0 24 24"><path d="M12 3 7 8H3v8h4l5 5V3Zm4.6 2.6a7 7 0 0 1 0 12.8l-1-1.7a5 5 0 0 0 0-9.4l1-1.7Zm2.8-2.9a10.4 10.4 0 0 1 0 18.6l-1-1.7a8.4 8.4 0 0 0 0-15.2l1-1.7Z"/></svg>
   </button>
 
-  <!-- pause indicator -->
+  <!-- pause / play indicator -->
   <div id="pause-icon" hidden>
     <svg viewBox="0 0 24 24"><path d="M7 4.5 19.5 12 7 19.5v-15Z"/></svg>
   </div>
+
+  <!-- ============ PROFILE PAGE ============ -->
+  <section id="profile-page">
+    <header class="pp-head">
+      <button id="pp-back" aria-label="Kembali">
+        <svg viewBox="0 0 24 24"><path d="M15.5 4 8 12l7.5 8 1.5-1.4L10.9 12 17 5.4 15.5 4Z"/></svg>
+      </button>
+      <span id="pp-title">username</span>
+    </header>
+    <div class="pp-scroll">
+      <div class="pp-top">
+        <div id="pp-avatar" class="pp-avatar">A</div>
+        <div id="pp-name" class="pp-name">@user</div>
+        <div class="pp-stats">
+          <div><b id="pp-following">0</b><span>Mengikuti</span></div>
+          <div><b id="pp-followers">0</b><span>Pengikut</span></div>
+          <div><b id="pp-likes">0</b><span>Suka</span></div>
+        </div>
+        <div id="pp-actions" class="pp-actions"></div>
+        <div id="pp-bio" class="pp-bio"></div>
+      </div>
+      <div class="pp-tabs">
+        <button class="pp-tab active" data-ptab="videos" aria-label="Video">
+          <svg viewBox="0 0 24 24"><path d="M3 3h8v8H3V3Zm10 0h8v8h-8V3ZM3 13h8v8H3v-8Zm10 0h8v8h-8v-8Z"/></svg>
+        </button>
+        <button class="pp-tab" data-ptab="liked" aria-label="Disukai">
+          <svg viewBox="0 0 24 24"><path d="M12 21s-7.8-4.9-10.2-9.2C.2 8.9 2 5 5.6 5c2.2 0 3.4 1.2 4.4 2.6l2 2.7 2-2.7C15 6.2 16.2 5 18.4 5c3.6 0 5.4 3.9 3.8 6.8C19.8 16.1 12 21 12 21Z"/></svg>
+        </button>
+      </div>
+      <div id="pp-grid"></div>
+      <div id="pp-empty" hidden></div>
+    </div>
+  </section>
 
   <!-- ============ BOTTOM NAV ============ -->
   <nav id="bottomnav">

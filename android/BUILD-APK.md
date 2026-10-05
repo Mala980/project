@@ -39,11 +39,14 @@ gradle wrapper --gradle-version 8.7   # sekali saja (butuh gradle terpasang)
 | targetSdk | 34 |
 | Bahasa wrapper | Kotlin (1 file, ±60 baris) |
 | Bahasa aplikasi | HTML/CSS/JS murni, 0 dependensi npm |
-| Perizinan | hanya `INTERNET` |
-| Ukuran APK | ±2–3 MB (debug), ±1 MB (release+minify) |
+| Perizinan | `INTERNET` (+ penyimpanan utk unduhan, API ≤28) |
+| Ukuran APK | ±4–5 MB (debug, termasuk video demo), kecil tanpa media |
 
 ## Alternatif tanpa Android Studio
 - **Median.co / GoNative** — upload URL web, dapat APK instan.
 - **AppsGeyser** — konverter web→APK gratis.
+- **Unduhan di APK**: tombol "Unduh video" memakai `AndroidBridge`
+  (DownloadManager untuk URL https, penyalinan aset untuk video lokal).
+
 - **Capacitor** (`npm i @capacitor/core @capacitor/cli && npx cap init && npx cap add android`)
   jika kelak butuh plugin native (kamera, push, dll).
