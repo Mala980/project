@@ -40,6 +40,24 @@ android/              # proyek wrapper WebView Android (Kotlin, 1 file + bridge 
 tools/gen-videos.sh   # regenerasi video demo (butuh ffmpeg / otomatis via npm)
 ```
 
+## 📊 Data referensi resmi TikTok
+`data/tiktok-reference.json` berisi data yang diambil **langsung dari sumber publik
+resmi** (2026-10-05): warna brand + Pantone (TikTok For Business Brand Guidelines),
+terminologi produk (TikTok Newsroom), serta hashtag trending Indonesia
+(TokChart & TikTok Discover). Data dipakai aplikasi untuk sheet **Sedang Tren**
+(ikon 🔍), token warna brand, dan string UI (lihat `app/js/data.js`,
+dibangkitkan oleh `tools/build-data.js` — jangan edit manual).
+Catatan: API privat aplikasi resmi butuh autentikasi & dilarang ToS, jadi hanya
+sumber publik resmi yang diambil.
+
+## 🤖 GitHub CI (Actions)
+`.github/workflows/ci.yml` berjalan otomatis di tiap push/PR:
+1. **validate-data** — cek konsistensi `data.js` ↔ `tiktok-reference.json`
+2. **build-apk** — build APK Android (Gradle 8.7 + JDK 17), upload artifact `TikTokLite-APK-debug`
+3. **deploy-web** — deploy aplikasi web ke **GitHub Pages**
+
+Unduh APK dari tab **Actions → run terakhir → Artifacts**.
+
 ## 📱 Build APK
 Lihat **[android/BUILD-APK.md](android/BUILD-APK.md)**:
 ```bash

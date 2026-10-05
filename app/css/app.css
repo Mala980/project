@@ -278,6 +278,18 @@ button{font-family:inherit;color:inherit;background:none;border:0;cursor:pointer
 .sheet-cancel-wrap{flex:1;display:flex;align-items:flex-end;border-top:.5px solid rgba(255,255,255,.08)}
 #btn-cancel-share{width:100%;padding:15px 0 calc(15px + var(--safe-b));font-size:15px;font-weight:600;color:#fff}
 
+/* ---------- trending sheet ---------- */
+.trend-sub{padding:0 16px 10px;font-size:12.5px;color:rgba(255,255,255,.55);flex:none}
+#trend-list{flex:1;overflow-y:auto;padding-bottom:6px;scrollbar-width:none}
+#trend-list::-webkit-scrollbar{display:none}
+.trend-item{display:flex;align-items:center;gap:14px;width:100%;padding:11px 18px;text-align:left}
+.trend-item .rank{width:22px;font-size:15px;font-weight:700;color:rgba(255,255,255,.5);text-align:center;flex:none}
+.trend-item:nth-child(-n+3) .rank{color:var(--pink)}
+.trend-item .t-tag{font-size:15px;font-weight:700}
+.trend-item .t-meta{font-size:12.5px;color:rgba(255,255,255,.5);margin-top:2px}
+.trend-chips{flex:none;display:flex;gap:8px;flex-wrap:wrap;padding:10px 16px calc(12px + var(--safe-b));border-top:.5px solid rgba(255,255,255,.08)}
+.chip{padding:7px 13px;border-radius:16px;background:#2a2a2a;font-size:12.5px;font-weight:600;color:rgba(255,255,255,.85)}
+
 /* toast */
 #toast{
   position:fixed;left:50%;bottom:calc(var(--nav-h) + var(--safe-b) + 26px);

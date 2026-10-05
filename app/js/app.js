@@ -105,6 +105,24 @@ let activeSlide = null;
 let currentCommentPost = null;
 let profileTarget = null;
 
+/* ---------- data referensi resmi TikTok (app/js/data.js) ---------- */
+const REF = window.TIKTOK_DATA || null;
+if (REF) {
+  const c = REF.brand.colors;
+  document.documentElement.style.setProperty("--pink", c.razzmatazz.hex);
+  document.documentElement.style.setProperty("--cyan", c.splash.hex);
+  const L = REF.ui_strings["id-ID"];
+  const put = (sel, txt) => { const n = document.querySelector(sel); if (n) n.textContent = txt; };
+  put('.tab[data-tab="following"]', L.mengikuti);
+  put('.tab[data-tab="foryou"]', L.untuk_anda);
+  put('.navbtn[data-nav="home"] span', L.beranda);
+  put('.navbtn[data-nav="friends"] span', L.teman);
+  put('.navbtn[data-nav="inbox"] span', L.kotak_masuk);
+  put('.navbtn[data-nav="profile"] span', L.profil);
+  put('#trend-title', L.sedang_tren);
+  document.querySelector("#comment-text")?.setAttribute("placeholder", L.tambahkan_komentar);
+}
+
 /* ---------- build feed ---------- */
 const feed = $("#feed");
 
@@ -302,6 +320,31 @@ document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () =>
   if (t.dataset.tab === "following") toast("Feed 'Mengikuti' kosong — ikuti kreator dulu ya!");
   feed.scrollTo({ top: 0, behavior: "smooth" });
 }));
+
+/* ============ TRENDING (data referensi resmi TikTok) ============ */
+$("#btn-search").addEventListener("click", openTrend);
+$("#btn-close-trend").addEventListener("click", closeSheets);
+function openTrend(){
+  const list = $("#trend-list");
+  list.innerHTML = "";
+  (REF?.trending?.indonesia || []).forEach((t, i) => {
+    const row = el("button","trend-item");
+    row.innerHTML = `<span class="rank">${i+1}</span>
+      <div class="t-body"><div class="t-tag">#${t.tag}</div>
+      <div class="t-meta">${t.videos} video · ${t.views}x ditonton</div></div>`;
+    row.addEventListener("click", () => toast(`Menjelajahi #${t.tag} (demo)`));
+    list.appendChild(row);
+  });
+  const chips = $("#trend-chips");
+  chips.innerHTML = "";
+  (REF?.trending?.fyp_indonesia || []).forEach(tag => {
+    const b = el("button","chip","#" + tag);
+    b.addEventListener("click", () => toast(`Menjelajahi #${tag} (demo)`));
+    chips.appendChild(b);
+  });
+  $("#trend-sheet").classList.add("open");
+  $("#overlay").classList.add("show");
+}
 
 /* ============ COMMENTS ============ */
 function openComments(p){
