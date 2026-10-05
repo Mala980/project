@@ -1,0 +1,365 @@
+/* ============================================================
+   TikTok Lite — vanilla JS, zero dependencies
+   Core features: vertical video feed, like, comment, share,
+   follow, progress bar, double-tap like, mute, autoplay.
+   ============================================================ */
+"use strict";
+
+const V = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/";
+
+const POSTS = [
+  { user:"bigbuckbunny.id",  name:"Big Buck Bunny",   cap:"Pagi hari di hutan yang damai 🐰✨ Siapa yang relate? #animasi #fyp #santaisore", song:"suara asli - Big Buck Bunny", likes:1543000, comments:2384, shares:45210, saves:89300,
+    video:V+"BigBuckBunny.mp4", hue:210 },
+  { user:"dj.viral99",       name:"DJ Viral",         cap:"Sound ini lagi naik terus 🔥🔊 Pakai sound ini biar masuk FYP! #djremix #viral2026 #jedagjedug", song:"DJ Remix Viral 2026 - dj.viral99", likes:3200000, comments:18400, shares:210500, saves:452100,
+    video:V+"ForBiggerBlazes.mp4", hue:330 },
+  { user:"jalanjalan.yuk",   name:"Jalan Jalan Yuk",  cap:"POV: kamu akhirnya liburan setelah 3 bulan kerja 💼✈️ #travel #healing #pantai", song:"Sunset Vibes - Chill Beats", likes:876400, comments:5620, shares:23100, saves:67800,
+    video:V+"ForBiggerEscapes.mp4", hue:160 },
+  { user:"kucingorem",       name:"Kucing Orem",      cap:"Definisi bahagia itu sederhana 😹🐱 Tag teman kamu yang kayak gini! #kucing #catsoftiktok #lucu", song:"suara asli - Kucing Orem", likes:5600000, comments:42300, shares:512000, saves:1200000,
+    video:V+"ForBiggerFun.mp4", hue:35 },
+  { user:"otomotif.gas",     name:"Otomotif Gas",     cap:"Tes jalur ekstrem hari ini 🚗💨 Kira-kira lolos nggak ya? #otomotif #offroad #seru", song:"Engine Roar - Sound Library", likes:432000, comments:3210, shares:12700, saves:21500,
+    video:V+"SubaruOutbackOnStreetAndDirt.mp4", hue:15 },
+  { user:"film.pendek",      name:"Film Pendek ID",   cap:"Episode 3 sudah tayang 🎬 Jangan lupa follow biar nggak ketinggalan! #filmindonesia #webseries #drama", song:"Original Score - Film Pendek ID", likes:1980000, comments:12700, shares:88400, saves:301200,
+    video:V+"TearsOfSteel.mp4", hue:265 },
+  { user:"animasi.nusantara",name:"Animasi Nusantara",cap:"Karya anak bangsa, bangga nggak? 🇮🇩❤️ Share kalau kalian bangga! #animasi #karyalokal #bangga", song:"suara asli - Animasi Nusantara", likes:2450000, comments:9800, shares:156000, saves:234000,
+    video:V+"ElephantsDream.mp4", hue:190 },
+  { user:"resep.emak",       name:"Resep Emak",       cap:"5 menit langsung jadi! Resep rahasia keluarga nih 🍜😋 #kuliner #resepviral #masaksimple", song:"suara asli - Resep Emak", likes:743000, comments:6540, shares:31800, saves:158700,
+    video:V+"ForBiggerJoyrides.mp4", hue:95 },
+];
+
+const COMMENT_POOL = [
+  ["rizky.pratama","Baru nemu akun ini, langsung follow! 🔥","2 j"],
+  ["salsabila_","Keren banget sih ini 😭❤️","3 j"],
+  ["budi.santoso88","Info lengkapnya dong kak, penasaran","5 j"],
+  ["nabila.citra","Udah 5 kali nonton dan nggak bosen 😂","6 j"],
+  ["dimasanggara","Definisi konten berkualitas 👏👏","8 j"],
+  ["ayupuspita_","Relate banget sama ini, nangis aku 🥹","10 j"],
+  ["fajar_sidiq","Soundnya apa kak? Bagus banget","12 j"],
+  ["intan.permata","Wajib masuk FYP ini sih ✨","1 h"],
+  ["yoga.prasetyo","Lanjut part 2 dong kak 🙏","1 h"],
+  ["melati.suci","Baru liat dan langsung share ke grup WA 😆","2 h"],
+];
+
+const SHARE_TARGETS = [
+  { n:"WhatsApp",      c:"#25D366", svg:"M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2Zm5.7 14.2c-.24.7-1.4 1.3-2 1.4-.5.1-1.1.2-3.3-.7-2.8-1.2-4.6-4-4.8-4.2-.13-.2-1.15-1.55-1.15-3 0-1.4.72-2.06.98-2.34.26-.28.57-.35.76-.35h.55c.17 0 .41-.06.64.49.24.57.8 1.97.87 2.11.07.14.12.31.02.5-.09.19-.14.3-.28.47l-.42.5c-.14.14-.29.3-.13.58.17.29.74 1.23 1.6 2 1.1.97 2.02 1.27 2.3 1.41.29.14.46.12.63-.07.16-.19.72-.84.9-1.13.2-.29.38-.24.64-.14.26.09 1.66.78 1.94.93.29.14.48.21.55.33.07.12.07.7-.17 1.38Z" },
+  { n:"Facebook",      c:"#1877F2", svg:"M13.5 22v-8h2.7l.4-3.2h-3.1V8.7c0-.9.25-1.55 1.58-1.55h1.68V4.3c-.3-.04-1.3-.13-2.46-.13-2.44 0-4.1 1.5-4.1 4.23v2.4H7.5V14h2.7v8h3.3Z" },
+  { n:"Messenger",     c:"#A334FA", svg:"M12 2C6.5 2 2 6.1 2 11.3c0 2.9 1.4 5.5 3.6 7.2V22l3.3-1.8c.97.27 2 .42 3.1.42 5.5 0 10-4.1 10-9.3S17.5 2 12 2Zm1.1 12.5-2.6-2.7-5 2.7 5.5-5.8 2.6 2.7 4.9-2.7-5.4 5.8Z" },
+  { n:"Pesan",         c:"#34C759", svg:"M12 3C6.5 3 2 6.9 2 11.7c0 2.7 1.4 5.1 3.6 6.7-.16 1.1-.66 2.2-1.6 3.1 1.6-.13 3-.65 4.1-1.3 1.2.36 2.5.55 3.9.55 5.5 0 10-3.9 10-8.7S17.5 3 12 3Zm-4.5 7h9v1.8h-9V10Z" },
+  { n:"Instagram",     c:"#E1306C", svg:"M8 2h8a6 6 0 0 1 6 6v8a6 6 0 0 1-6 6H8a6 6 0 0 1-6-6V8a6 6 0 0 1 6-6Zm0 2a4 4 0 0 0-4 4v8a4 4 0 0 0 4 4h8a4 4 0 0 0 4-4V8a4 4 0 0 0-4-4H8Zm9.5 1.75a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z" },
+  { n:"Salin tautan",  c:"#3f3f46", svg:"M10.6 13.4a1 1 0 0 0 1.4 1.4l4.9-4.9a3.5 3.5 0 0 0-4.9-4.9L9.8 7.2a1 1 0 1 0 1.4 1.4l2.2-2.2a1.5 1.5 0 0 1 2.1 2.1l-4.9 4.9Zm2.8-2.8a1 1 0 0 0-1.4-1.4L7.1 14.1a3.5 3.5 0 0 0 4.9 4.9l2.2-2.2a1 1 0 1 0-1.4-1.4l-2.2 2.2a1.5 1.5 0 0 1-2.1-2.1l4.9-4.9Z" },
+  { n:"Lainnya",       c:"#71717a", svg:"M5 10a2 2 0 1 1 0 4 2 2 0 0 1 0-4Zm7 0a2 2 0 1 1 0 4 2 2 0 0 1 0-4Zm7 0a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z" },
+];
+
+const ICONS = {
+  heart: '<svg viewBox="0 0 24 24"><path d="M12 21s-7.8-4.9-10.2-9.2C.2 8.9 2 5 5.6 5c2.2 0 3.4 1.2 4.4 2.6l2 2.7 2-2.7C15 6.2 16.2 5 18.4 5c3.6 0 5.4 3.9 3.8 6.8C19.8 16.1 12 21 12 21Z"/></svg>',
+  comment: '<svg viewBox="0 0 24 24"><path d="M12 2.5C6.2 2.5 1.5 6.7 1.5 11.9c0 2.9 1.5 5.6 3.9 7.3l-.9 3 3.3-1.7c1.3.4 2.7.6 4.2.6 5.8 0 10.5-4.2 10.5-9.4S17.8 2.5 12 2.5Z"/></svg>',
+  save: '<svg viewBox="0 0 24 24"><path d="M6 2h12a1 1 0 0 1 1 1v18.3a.7.7 0 0 1-1.1.6L12 17.6l-5.9 4.3A.7.7 0 0 1 5 21.3V3a1 1 0 0 1 1-1Z"/></svg>',
+  share: '<svg viewBox="0 0 24 24"><path d="M14.5 3.2 22.4 10a1 1 0 0 1 0 1.5l-7.9 6.8c-.6.6-1.7.1-1.7-.8v-3c-5.3.2-8.9 2.1-10.6 5.8-.3.6-1.2.5-1.3-.2C.4 12.3 4.7 6.9 12.8 6.2v-2.2c0-.9 1-1.4 1.7-.8Z"/></svg>',
+  plus: '<svg viewBox="0 0 24 24"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6V5Z"/></svg>',
+  check: '<svg viewBox="0 0 24 24"><path d="m9.5 16.2-3.7-3.7L4.4 14l5.1 5.1 9.1-9.1-1.4-1.4-7.7 7.6Z"/></svg>',
+  note: '<svg viewBox="0 0 24 24"><path d="M19 3h.5v13.2a3.3 3.3 0 1 1-2-3V6.9L9 8.6v8.1a3.3 3.3 0 1 1-2-3V6.4a1.5 1.5 0 0 1 1.2-1.5L19 3Z"/></svg>',
+};
+
+/* ---------- helpers ---------- */
+const $ = (s, r=document) => r.querySelector(s);
+const el = (tag, cls, html) => {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (html != null) n.innerHTML = html;
+  return n;
+};
+const fmt = n => {
+  if (n >= 1e6) return (n/1e6).toFixed(1).replace(".", ",").replace(",0","") + " jt";
+  if (n >= 1e4) return (n/1e3).toFixed(1).replace(".", ",").replace(",0","") + " rb";
+  return n.toLocaleString("id-ID");
+};
+const initials = u => u.replace(/[^a-zA-Z]/g,"").slice(0,1).toUpperCase() || "T";
+
+let toastTimer;
+function toast(msg){
+  const t = $("#toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 1900);
+}
+
+/* ---------- global state ---------- */
+let globalMuted = true;
+let activeSlide = null;
+let currentCommentPost = null;
+
+/* ---------- build feed ---------- */
+const feed = $("#feed");
+
+POSTS.forEach((p, i) => {
+  p.liked = false; p.saved = false; p.following = false;
+  p._likes = p.likes; p._saves = p.saves;
+  p.commentList = [];
+
+  const slide = el("section","slide");
+  slide.dataset.i = i;
+  slide.innerHTML = `
+    <video loop playsinline preload="metadata" muted src="${p.video}"></video>
+    <div class="loader"></div>
+    <div class="shade-top"></div><div class="shade-bottom"></div>
+
+    <div class="rail">
+      <div class="avatar-wrap">
+        <div class="avatar" style="background:hsl(${p.hue} 65% 45%)">${initials(p.user)}</div>
+        <button class="follow-plus" aria-label="Ikuti">${ICONS.plus}</button>
+      </div>
+      <button class="rail-item like-btn">${ICONS.heart}<span class="cnt">${fmt(p._likes)}</span></button>
+      <button class="rail-item comment-btn">${ICONS.comment}<span class="cnt">${fmt(p.comments)}</span></button>
+      <button class="rail-item save-btn">${ICONS.save}<span class="cnt">${fmt(p._saves)}</span></button>
+      <button class="rail-item share-btn">${ICONS.share}<span class="cnt">${fmt(p.shares)}</span></button>
+      <div class="vinyl"><div class="disc" style="background:hsl(${(p.hue+40)%360} 70% 55%)">♪</div></div>
+    </div>
+
+    <div class="meta">
+      <div class="user">@${p.user}</div>
+      <div class="cap">${p.cap.replace(/#(\w[\w.]*)/g,'<span class="tag">#$1</span>')}</div>
+      <div class="music">${ICONS.note}<div class="marquee"><span>${p.song} &nbsp;•&nbsp; ${p.song} &nbsp;•&nbsp; </span></div></div>
+    </div>
+    <div class="progress"><i></i></div>`;
+
+  const video = $("video", slide);
+  video.muted = true;
+  video.addEventListener("canplay", () => $(".loader", slide)?.remove(), { once:true });
+  video.addEventListener("timeupdate", () => {
+    if (video.duration) $(".progress i", slide).style.width = (video.currentTime/video.duration*100) + "%";
+  });
+
+  /* follow */
+  $(".follow-plus", slide).addEventListener("click", e => {
+    e.stopPropagation();
+    p.following = !p.following;
+    const b = e.currentTarget;
+    b.classList.toggle("followed", p.following);
+    b.innerHTML = p.following ? ICONS.check : ICONS.plus;
+    toast(p.following ? `Berhasil mengikuti @${p.user}` : `Berhenti mengikuti @${p.user}`);
+  });
+
+  /* like */
+  const likeBtn = $(".like-btn", slide);
+  likeBtn.addEventListener("click", e => { e.stopPropagation(); toggleLike(p, slide, true); });
+
+  /* save */
+  const saveBtn = $(".save-btn", slide);
+  saveBtn.addEventListener("click", e => {
+    e.stopPropagation();
+    p.saved = !p.saved;
+    p._saves += p.saved ? 1 : -1;
+    saveBtn.classList.toggle("saved", p.saved);
+    $(".cnt", saveBtn).textContent = fmt(p._saves);
+    toast(p.saved ? "Disimpan ke favorit" : "Dihapus dari favorit");
+  });
+
+  /* comments */
+  $(".comment-btn", slide).addEventListener("click", e => { e.stopPropagation(); openComments(p); });
+
+  /* share */
+  $(".share-btn", slide).addEventListener("click", e => { e.stopPropagation(); openShare(p); });
+
+  /* tap / double tap on video area */
+  let lastTap = 0, tapTimer = null;
+  slide.addEventListener("click", e => {
+    if (e.target.closest(".rail,.meta,.follow-plus")) return;
+    const now = Date.now();
+    if (now - lastTap < 290) {
+      clearTimeout(tapTimer); lastTap = 0;
+      doubleTapLike(slide, p, e.clientX, e.clientY);
+      return;
+    }
+    lastTap = now;
+    tapTimer = setTimeout(() => togglePlay(slide), 290);
+  });
+
+  feed.appendChild(slide);
+});
+
+/* ---------- interactions ---------- */
+function toggleLike(p, slide, fromBtn){
+  p.liked = !p.liked;
+  p._likes += p.liked ? 1 : -1;
+  const b = $(".like-btn", slide);
+  b.classList.toggle("liked", p.liked);
+  $(".cnt", b).textContent = fmt(p._likes);
+}
+
+function doubleTapLike(slide, p, x, y){
+  const phone = $("#phone").getBoundingClientRect();
+  if (!p.liked) toggleLike(p, slide);
+  const h = el("div","float-heart", ICONS.heart);
+  h.style.left = (x - phone.left) + "px";
+  h.style.top  = (y - phone.top) + "px";
+  slide.appendChild(h);
+  h.addEventListener("animationend", () => h.remove());
+  if (navigator.vibrate) navigator.vibrate(12);
+}
+
+function togglePlay(slide){
+  const v = $("video", slide);
+  const ic = $("#pause-icon");
+  if (v.paused) { v.play(); ic.hidden = true; }
+  else {
+    v.pause();
+    ic.hidden = false;
+    ic.style.animation = "none"; void ic.offsetWidth; ic.style.animation = "";
+    slide.appendChild(ic);
+  }
+}
+
+/* ---------- playback control ---------- */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(en => {
+    const slide = en.target, v = $("video", slide);
+    if (en.isIntersecting && en.intersectionRatio > 0.6) {
+      activeSlide = slide;
+      v.muted = globalMuted;
+      v.play().catch(() => {});
+      slide.classList.add("playing");
+      $("#pause-icon").hidden = true;
+      if (!v.dataset.warm) { v.dataset.warm = 1; }
+    } else {
+      v.pause();
+      slide.classList.remove("playing");
+      if (activeSlide === slide) activeSlide = null;
+    }
+  });
+}, { root: feed, threshold: [0, 0.65, 1] });
+document.querySelectorAll(".slide").forEach(s => io.observe(s));
+
+/* ---------- mute ---------- */
+$("#btn-mute").addEventListener("click", () => {
+  globalMuted = !globalMuted;
+  $("#btn-mute").classList.toggle("unmuted", !globalMuted);
+  document.querySelectorAll(".slide video").forEach(v => v.muted = globalMuted);
+  toast(globalMuted ? "Suara dimatikan" : "Suara dinyalakan");
+});
+
+/* ---------- top tabs ---------- */
+document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => {
+  document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
+  t.classList.add("active");
+  if (t.dataset.tab === "following") toast("Feed 'Mengikuti' kosong — ikuti kreator dulu ya!");
+  feed.scrollTo({ top: 0, behavior: "smooth" });
+}));
+
+/* ---------- comments sheet ---------- */
+function openComments(p){
+  currentCommentPost = p;
+  const list = $("#comments-list");
+  list.innerHTML = "";
+  if (!p.commentList.length) {
+    // seed deterministic comments from pool
+    const n = 4 + (p.likes % 4);
+    for (let k = 0; k < n; k++) {
+      const c = COMMENT_POOL[(POSTS.indexOf(p) * 3 + k * 2) % COMMENT_POOL.length];
+      p.commentList.push({ user:c[0], text:c[1], time:c[2], likes:Math.floor(Math.random()*900)+5, liked:false, hue:(c[0].length*47)%360 });
+    }
+  }
+  p.commentList.forEach((c, idx) => list.appendChild(commentNode(p, c, idx)));
+  $("#comments-title").textContent = `${fmt(p.comments)} komentar`;
+  $("#comments-sheet").classList.add("open");
+  $("#comments-sheet").setAttribute("aria-hidden","false");
+  $("#overlay").classList.add("show");
+}
+function commentNode(p, c, idx){
+  const row = el("div","comment");
+  row.innerHTML = `
+    <div class="c-avatar" style="background:hsl(${c.hue} 55% 45%)">${initials(c.user)}</div>
+    <div class="c-body">
+      <div class="c-name">${c.user}</div>
+      <div class="c-text">${c.text}</div>
+      <div class="c-time">${c.time} <b>Balas</b></div>
+    </div>
+    <button class="c-like ${c.liked ? "liked":""}">${ICONS.heart}<span>${fmt(c.likes)}</span></button>`;
+  $(".c-like", row).addEventListener("click", () => {
+    c.liked = !c.liked;
+    c.likes += c.liked ? 1 : -1;
+    $(".c-like", row).classList.toggle("liked", c.liked);
+    $(".c-like span", row).textContent = fmt(c.likes);
+  });
+  return row;
+}
+function closeSheets(){
+  document.querySelectorAll(".sheet").forEach(s => { s.classList.remove("open"); s.setAttribute("aria-hidden","true"); });
+  $("#overlay").classList.remove("show");
+}
+$("#btn-close-comments").addEventListener("click", closeSheets);
+$("#overlay").addEventListener("click", closeSheets);
+
+const cInput = $("#comment-text");
+cInput.addEventListener("input", () => $("#comment-send").classList.toggle("ready", !!cInput.value.trim()));
+function sendComment(){
+  const text = cInput.value.trim();
+  if (!text || !currentCommentPost) return;
+  const c = { user:"kamu", text, time:"Baru saja", likes:0, liked:false, hue:217 };
+  currentCommentPost.commentList.unshift(c);
+  currentCommentPost.comments += 1;
+  $("#comments-list").prepend(commentNode(currentCommentPost, c, 0));
+  $("#comments-title").textContent = `${fmt(currentCommentPost.comments)} komentar`;
+  const slide = feed.children[POSTS.indexOf(currentCommentPost)];
+  $(".comment-btn .cnt", slide).textContent = fmt(currentCommentPost.comments);
+  cInput.value = "";
+  $("#comment-send").classList.remove("ready");
+  $("#comments-list").scrollTop = 0;
+}
+$("#comment-send").addEventListener("click", sendComment);
+cInput.addEventListener("keydown", e => { if (e.key === "Enter") sendComment(); });
+
+/* ---------- share sheet ---------- */
+function openShare(p){
+  const row = $("#share-row");
+  row.innerHTML = "";
+  SHARE_TARGETS.forEach(t => {
+    const item = el("button","share-item");
+    item.innerHTML = `<div class="share-ic" style="background:${t.c}"><svg viewBox="0 0 24 24"><path d="${t.svg}"/></svg></div><span>${t.n}</span>`;
+    item.addEventListener("click", () => {
+      if (t.n === "Salin tautan") {
+        const link = location.href.split("#")[0] + "?v=" + POSTS.indexOf(p);
+        (navigator.clipboard?.writeText(link) || Promise.reject()).then(
+          () => toast("Tautan disalin!"),
+          () => toast("Tautan: " + link)
+        );
+      } else {
+        toast(`Dibagikan ke ${t.n} (demo)`);
+      }
+      closeSheets();
+    });
+    row.appendChild(item);
+  });
+  $("#share-sheet").classList.add("open");
+  $("#share-sheet").setAttribute("aria-hidden","false");
+  $("#overlay").classList.add("show");
+}
+$("#btn-cancel-share").addEventListener("click", closeSheets);
+
+/* ---------- bottom nav ---------- */
+document.querySelectorAll(".navbtn").forEach(b => b.addEventListener("click", () => {
+  const nav = b.dataset.nav;
+  if (nav === "home") {
+    feed.scrollTo({ top: 0, behavior: "smooth" });
+    return;
+  }
+  document.querySelectorAll(".navbtn").forEach(x => x.classList.remove("active"));
+  if (nav === "create") { toast("🎬 Fitur buat video tidak termasuk versi inti"); return; }
+  b.classList.add("active");
+  const label = { friends:"Teman", inbox:"Kotak Masuk", profile:"Profil" }[nav];
+  toast(`Halaman ${label} tidak termasuk fitur inti 🚧`);
+  setTimeout(() => { b.classList.remove("active"); $(".navbtn[data-nav=home]").classList.add("active"); }, 1400);
+}));
+
+/* ---------- keyboard (desktop nicety) ---------- */
+document.addEventListener("keydown", e => {
+  if (e.target.tagName === "INPUT") return;
+  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+    e.preventDefault();
+    const dir = e.key === "ArrowDown" ? 1 : -1;
+    const idx = Math.max(0, [...feed.children].indexOf(activeSlide));
+    const next = feed.children[Math.min(feed.children.length-1, Math.max(0, idx+dir))];
+    next?.scrollIntoView({ behavior:"smooth" });
+  }
+  if (e.key === " ") { e.preventDefault(); if (activeSlide) togglePlay(activeSlide); }
+  if (e.key === "m") $("#btn-mute").click();
+});

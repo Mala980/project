@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ikon launcher gaya TikTok: not balok cyan/merah/putih di latar hitam -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+
+    <path android:fillColor="#000000" android:pathData="M0,0h108v108h-108z" />
+
+    <!-- bayangan cyan -->
+    <path android:fillColor="#25F4EE"
+        android:pathData="M56 22h11v41h-11zM52 56a16 16 0 1 0 .01 0z" />
+    <!-- bayangan merah -->
+    <path android:fillColor="#FE2C55"
+        android:pathData="M61 26h11v41h-11zM57 60a16 16 0 1 0 .01 0z" />
+    <!-- not putih -->
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M58.5 24h11v41h-11zM54.5 58a16 16 0 1 0 .01 0z" />
+    <!-- bendera not -->
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M69.5 24c1 7 6 11.5 12.5 12.5v10c-8-1-14-4.5-16.5-8v-14.5z" />
+</vector>
