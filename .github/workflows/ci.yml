@@ -49,10 +49,12 @@ jobs:
           path: android/app/build/outputs/apk/debug/app-debug.apk
 
   # 3) Deploy aplikasi web ke GitHub Pages
+  # Opsional: aktifkan dulu Settings → Pages → Source: GitHub Actions agar job ini hijau.
   deploy-web:
     name: Deploy web (GitHub Pages)
     runs-on: ubuntu-latest
     needs: build-apk
+    continue-on-error: true
     if: github.event_name != 'pull_request'
     permissions:
       pages: write
