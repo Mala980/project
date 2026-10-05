@@ -342,8 +342,77 @@ function openTrend(){
     b.addEventListener("click", () => toast(`Menjelajahi #${tag} (demo)`));
     chips.appendChild(b);
   });
+  renderApiList();
+  refreshApiLive();
   $("#trend-sheet").classList.add("open");
   $("#overlay").classList.add("show");
+}
+
+/* ============ API TikTok oEmbed (live + snapshot) ============ */
+const API_VIDEOS = REF?.api_oembed?.videos || [];
+
+function apiItemNode(v){
+  const row = el("button","api-item");
+  const handle = (v.author_url || "").split("@")[1] || v.author_name;
+  row.innerHTML = `
+    <div class="api-thumb">${v.thumbnail_url ? `<img src="${v.thumbnail_url}" alt="" onerror="this.parentNode.textContent='${initials(v.author_name)}'">` : initials(v.author_name)}</div>
+    <div class="api-body">
+      <div class="api-author">@${handle}</div>
+      <div class="api-title">${v.title}</div>
+      <div class="api-meta">${v.provider_name || "TikTok"}${v._live ? " · LIVE" : ""}${v.stats ? ` · ❤️ ${v.stats.likes} · 💬 ${v.stats.comments}` : ""}</div>
+    </div>`;
+  row.addEventListener("click", () => window.open(v.url, "_blank"));
+  return row;
+}
+function renderApiList(){
+  const list = $("#api-list");
+  list.innerHTML = "";
+  API_VIDEOS.forEach(v => list.appendChild(apiItemNode(v)));
+}
+
+function fetchWithTimeout(url, ms){
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), ms);
+  return fetch(url, { signal: ctl.signal }).finally(() => clearTimeout(t));
+}
+
+async function liveFetchOembed(v, i){
+  /* 1) jembatan native (APK): endpoint resmi tanpa batas CORS */
+  if (window.TikTokApi?.oembed) {
+    return await new Promise(res => {
+      const cb = "__onOembed" + i;
+      let done = false;
+      window[cb] = json => { if (!done) { done = true; delete window[cb]; res(json && json.title ? json : null); } };
+      setTimeout(() => { if (!done) { done = true; delete window[cb]; res(null); } }, 6000);
+      try { TikTokApi.oembed(v.url, cb); } catch (e) { if (!done) { done = true; res(null); } }
+    });
+  }
+  /* 2) browser: fetch langsung bila CORS mengizinkan */
+  if (typeof fetch === "function") {
+    try {
+      const r = await fetchWithTimeout("https://www.tiktok.com/oembed?url=" + encodeURIComponent(v.url), 4000);
+      if (r.ok) { const j = await r.json(); if (j && j.title) return j; }
+    } catch (e) { /* CORS/jaringan diblokir → pakai snapshot */ }
+  }
+  return null;
+}
+
+async function refreshApiLive(){
+  const st = $("#api-status");
+  st.textContent = "menghubungi API…";
+  st.className = "badge snap";
+  const results = await Promise.all(API_VIDEOS.map((v, i) => liveFetchOembed(v, i)));
+  let live = 0;
+  const list = $("#api-list");
+  list.innerHTML = "";
+  API_VIDEOS.forEach((v, i) => {
+    const j = results[i];
+    if (j) { live++; v.title = j.title; v.author_name = j.author_name; v.author_url = j.author_url;
+             if (j.thumbnail_url) v.thumbnail_url = j.thumbnail_url; v._live = true; }
+    list.appendChild(apiItemNode(v));
+  });
+  if (live) { st.textContent = "LIVE · " + live + " video"; st.className = "badge live"; }
+  else { st.textContent = "snapshot " + (REF?.api_oembed?.diambil_pada || ""); st.className = "badge snap"; }
 }
 
 /* ============ COMMENTS ============ */

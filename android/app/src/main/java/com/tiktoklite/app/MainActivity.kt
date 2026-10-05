@@ -55,6 +55,7 @@ class MainActivity : AppCompatActivity() {
         web.webChromeClient = WebChromeClient() // dukungan fullscreen video
         web.setBackgroundColor(0xFF000000.toInt())
         web.addJavascriptInterface(DownloadBridge(this), "AndroidBridge")
+        web.addJavascriptInterface(ApiBridge(web), "TikTokApi")
         web.loadUrl("file:///android_asset/index.html")
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -74,6 +75,37 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         web.destroy()
         super.onDestroy()
+    }
+}
+
+/**
+ * Bridge JS → native untuk API TikTok oEmbed (fetch LIVE dari perangkat,
+ * tidak terhalang CORS). Endpoint resmi publik: /oembed (tanpa autentikasi).
+ */
+class ApiBridge(private val web: WebView) {
+
+    @JavascriptInterface
+    fun oembed(videoUrl: String, callback: String) {
+        Thread {
+            val json = try {
+                val enc = java.net.URLEncoder.encode(videoUrl, "UTF-8")
+                httpGet("https://www.tiktok.com/oembed?url=$enc")
+            } catch (e: Exception) { null }
+            val payload = json ?: "null"
+            web.post { web.evaluateJavascript("$callback($payload)", null) }
+        }.start()
+    }
+
+    private fun httpGet(u: String): String {
+        val con = java.net.URL(u).openConnection() as java.net.HttpURLConnection
+        con.connectTimeout = 6000
+        con.readTimeout = 6000
+        con.setRequestProperty(
+            "User-Agent",
+            "Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36"
+        )
+        return if (con.responseCode == 200) con.inputStream.bufferedReader().readText()
+        else throw java.io.IOException("HTTP ${con.responseCode}")
     }
 }
 

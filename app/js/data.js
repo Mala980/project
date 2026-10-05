@@ -127,6 +127,74 @@ window.TIKTOK_DATA = {
       "HiddenGem"
     ]
   },
+  "api_oembed": {
+    "endpoint": "https://www.tiktok.com/oembed?url=<video_url>",
+    "diambil_pada": "2026-10-05",
+    "videos": [
+      {
+        "url": "https://www.tiktok.com/@scout2015/video/6718335390845095173",
+        "version": "1.0",
+        "type": "video",
+        "provider_name": "TikTok",
+        "provider_url": "https://www.tiktok.com/",
+        "title": "Scramble up ur name & I'll try to guess it😍❤️ #foryoupage #petsoftiktok #aesthetic",
+        "author_name": "Scout & Suki",
+        "author_url": "https://www.tiktok.com/@scout2015",
+        "thumbnail_url": "https://p16.muscdn.com/obj/tos-maliva-p-0068/06kv6rfcesljdjr45ukb0000d844090v0200010605",
+        "thumbnail_width": 720,
+        "thumbnail_height": 1280,
+        "sumber_snapshot": "contoh respons resmi (dokumentasi/SDK publik)"
+      },
+      {
+        "url": "https://www.tiktok.com/@khaby.lame/video/7652012587009215774",
+        "version": "1.0",
+        "type": "video",
+        "provider_name": "TikTok",
+        "provider_url": "https://www.tiktok.com/",
+        "title": "Bro…. Where is the rest of my rice? 🍚🤨 #learnfromkhaby #comedy",
+        "author_name": "Khabane lame",
+        "author_url": "https://www.tiktok.com/@khaby.lame",
+        "thumbnail_url": null,
+        "stats": {
+          "likes": "3.5M",
+          "comments": "52.9K"
+        },
+        "sumber_snapshot": "metadata publik halaman video"
+      },
+      {
+        "url": "https://www.tiktok.com/@khaby.lame/video/7431647912788069654",
+        "version": "1.0",
+        "type": "video",
+        "provider_name": "TikTok",
+        "provider_url": "https://www.tiktok.com/",
+        "title": "Try it and let me know #learnfromkhaby #comedy",
+        "author_name": "Khabane lame",
+        "author_url": "https://www.tiktok.com/@khaby.lame",
+        "thumbnail_url": null,
+        "stats": {
+          "likes": "2.8M",
+          "comments": "27.5K"
+        },
+        "sumber_snapshot": "metadata publik halaman video"
+      },
+      {
+        "url": "https://www.tiktok.com/@khaby.lame/video/7617913537561693470",
+        "version": "1.0",
+        "type": "video",
+        "provider_name": "TikTok",
+        "provider_url": "https://www.tiktok.com/",
+        "title": "Let’s just use regular belt from now on 😭 #learnfromkhaby #comedy",
+        "author_name": "Khabane lame",
+        "author_url": "https://www.tiktok.com/@khaby.lame",
+        "thumbnail_url": null,
+        "stats": {
+          "likes": "3.5M",
+          "comments": "27.5K"
+        },
+        "sumber_snapshot": "metadata publik halaman video"
+      }
+    ]
+  },
   "meta": {
     "diambil_pada": "2026-10-05",
     "sumber": [

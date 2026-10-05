@@ -10,15 +10,22 @@ const path = require("path");
 
 const ROOT = path.join(__dirname, "..");
 const SRC = path.join(ROOT, "data", "tiktok-reference.json");
+const API = path.join(ROOT, "data", "tiktok-api-oembed.json");
 const OUT = path.join(ROOT, "app", "js", "data.js");
 
 const json = JSON.parse(fs.readFileSync(SRC, "utf8"));
+const apiJson = JSON.parse(fs.readFileSync(API, "utf8"));
 
 // Buang field internal yang tidak dibutuhkan runtime
 const data = {
   brand: json.brand,
   ui_strings: json.ui_strings,
   trending: json.trending,
+  api_oembed: {
+    endpoint: apiJson.meta.endpoint,
+    diambil_pada: apiJson.meta.diambil_pada,
+    videos: apiJson.videos,
+  },
   meta: { diambil_pada: json.meta.diambil_pada, sumber: json.meta.sumber.map(s => s.nama) },
 };
 

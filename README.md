@@ -50,6 +50,17 @@ dibangkitkan oleh `tools/build-data.js` — jangan edit manual).
 Catatan: API privat aplikasi resmi butuh autentikasi & dilarang ToS, jadi hanya
 sumber publik resmi yang diambil.
 
+## 📡 Fetch LIVE dari API TikTok (oEmbed)
+`data/tiktok-api-oembed.json` = snapshot respons **API resmi publik**
+`GET https://www.tiktok.com/oembed?url=<video>` (skema lengkap: title,
+author_name/url, thumbnail_url, provider, dimensi). Di dalam app (sheet 🔍 →
+blok "API TikTok"):
+- **APK**: jembatan native `TikTokApi.oembed()` mem-fetch endpoint resmi secara
+  LIVE (tanpa batas CORS) → badge **LIVE**.
+- **Browser**: `fetch` langsung; bila CORS/jaringan menolak → jatuh kembali ke
+  **snapshot** ber-tanggal.
+- Item diklik → membuka video asli di TikTok.
+
 ## 🤖 GitHub CI (Actions)
 `.github/workflows/ci.yml` berjalan otomatis di tiap push/PR:
 1. **validate-data** — cek konsistensi `data.js` ↔ `tiktok-reference.json`
